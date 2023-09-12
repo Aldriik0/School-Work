@@ -1,20 +1,94 @@
 package com.example.homework1
 
 import kotlin.random.Random
+import kotlin.system.exitProcess
 
 class Game
 {
     private val usedNumMap = mutableMapOf<Int,Int>()
-    private val ranks = mutableListOf<MutableList<Int>>()
+    private val ranks = mutableMapOf<Int, Int>()
+    private var turn : Int
+
     init
     {
         for(count in 1 .. 10)
-            ranks[count-1][0] = count
+            ranks[count] = -1
+        turn = 10
     }
 
     fun mainGame()
     {
+        while(turn != 0)
+        {
+            startTurn()
+            if(!isSorted())
+            {
+                println("You lost, a number does not adhere to" +
+                        "the rules of the game!")
+                exitProcess(0)
+            }
+        }
+    }
 
+    private fun startTurn()
+    {
+        var num = randomNumGen()
+        println("Remaining Placements: $turn")
+        println("Generated num: $num")
+        println(toString())
+        print("Choose a ranking (1-10) or 'q' to quit: ")
+        var input = userInput()
+        ranks[input] = num
+        turn--
+    }
+
+    private fun userInput() : Int
+    {
+        var input = readln()
+        val regex = "^[A-Za-z]*$".toRegex()
+        while(true)
+        {
+            if(input == "q")
+                exitProcess(0)
+            else if (regex.matches(input))
+            {
+                println("Please put in a valid input. Either a rank" +
+                        "1-10 or q if you would like to quit: ")
+                input = readln()
+            }
+            else if(!validRankInput(input!!.toInt()))
+            {
+                println("Please put a valid rank position. The rank" +
+                        "you entered is unavailable")
+                input = readln()
+            }
+            else
+                break
+        }
+        return input!!.toInt()
+    }
+
+    private fun validRankInput(rank: Int) : Boolean
+    {
+        if(ranks[rank] == -1)
+            return true
+        return false
+    }
+
+
+    override fun toString(): String
+    {
+        var str : String = ""
+        for(count in 1 ..10)
+        {
+            str += "Rank ${count}: "
+            if(ranks[count] == -1)
+                str += "-\n"
+            else
+                str += "${ranks[count]}\n"
+        }
+
+        return str
     }
 
     private fun randomNumGen() : Int
@@ -37,23 +111,21 @@ class Game
 
     private fun isSorted() : Boolean
     {
-        val array = removeBlanks()
-        for(i in 0 until array.size-1)
+        var isBiggest = -1
+        for(count in 1 .. 10)
         {
-            if(array[i] > array[i+1])
+            if(ranks[count] != -1 && isBiggest == -1)
+                isBiggest = ranks[count]!!
+            else if(isBiggest > ranks[count]!! && ranks[count] != -1)
                 return false
+            else if(isBiggest < ranks[count]!! && ranks[count] != -1)
+                isBiggest = ranks[count]!!
         }
         return true
     }
 
-    private fun removeBlanks() : IntArray
-    {
-        var array = intArrayOf()
-        for(count in 0 until ranks.size)
-            if(ranks[count][1] != null)
-                array.plus(ranks[count][1])
-        return array
-    }
+
+
 }
 fun main()
 {
