@@ -1,12 +1,12 @@
 package com.example.homework1
 
-import kotlin.random.Random
 import kotlin.system.exitProcess
 
 class Game
 {
     private val usedNumMap = mutableMapOf<Int,Int>()
     private val ranks = mutableMapOf<Int, Int>()
+    private var tmpMap = mutableMapOf<Int, Int>()
     private var turn : Int
 
     init
@@ -21,12 +21,14 @@ class Game
         while(turn != 0)
         {
             startTurn()
-            if(!isSorted())
-            {
-                println("You lost, the number you placed wasn't in ascending order")
-                exitProcess(0)
-            }
         }
+        if(!isSorted())
+        {
+            println("You lost, the number you placed wasn't in ascending order")
+            exitProcess(0)
+        }
+        println("Congrats, you won!")
+
     }
 
     private fun startTurn()
@@ -55,7 +57,7 @@ class Game
                         "1-10 or q if you would like to quit: ")
                 input = readln()
             }
-            else if(!validRankInput(input!!.toInt()))
+            else if(!validRankInput(input!!.toInt(), num))
             {
                 println("Please put a valid rank position. The rank" +
                         "you entered is unavailable")
@@ -67,12 +69,16 @@ class Game
         return input!!.toInt()
     }
 
-    private fun validRankInput(rank: Int) : Boolean
+    //Checks to see if the
+    private fun validRankInput(rank: Int, num: Int) : Boolean
     {
         if(rank > 10 || rank < 0)
             return false
         if(ranks[rank] == -1)
-            return true
+        {
+            if(isValidPlacement(rank, num))
+                return true
+        }
         return false
     }
 
@@ -93,13 +99,13 @@ class Game
 
     private fun randomNumGen() : Int
     {
-        var num : List<Int> = List(1){ Random.nextInt(0,999)}
-        while(randomNumCheck(num[0]))
+        var num = (0..999).random()
+        while(randomNumCheck(num))
         {
-            num = List(1){Random.nextInt(0,999)}
+            num = (0..999).random()
         }
-        usedNumMap[num[0]] = 1 //using 1 to denote that one exists
-        return num[0]
+        usedNumMap[num] = 1 //using 1 to denote that one exists
+        return num
     }
 
     private fun randomNumCheck(num: Int) : Boolean
@@ -124,9 +130,35 @@ class Game
         return true
     }
 
+    private fun isMapSorted() : Boolean
+    {
+        var isBiggest = -1
+        for(count in 1 .. 10)
+        {
+            if(tmpMap[count] != -1 && isBiggest == -1)
+                isBiggest = tmpMap[count]!!
+            else if(isBiggest > tmpMap[count]!! && tmpMap[count] != -1)
+                return false
+            else if(isBiggest < tmpMap[count]!! && tmpMap[count] != -1)
+                isBiggest = tmpMap[count]!!
+        }
+        return true
+    }
+    private fun isValidPlacement(num: Int, rank: Int) : Boolean
+    {
 
+        if(turn == 10)
+            return true
+        tmpMap = ranks
+        tmpMap[rank] = num
+        if(isMapSorted())
+            return true
+        return false
+    }
 
 }
+
+
 fun main()
 {
     val game = Game()
