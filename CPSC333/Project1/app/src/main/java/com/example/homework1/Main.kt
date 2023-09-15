@@ -76,28 +76,6 @@ class Game
         return false
     }
 
-
-    private fun checkValidSpots(num: Int) : Int
-    {
-        var lowestAvailableRank = 1
-        var ptr = 1
-        while(true)
-        {
-            if(ranks[ptr]!! > num)
-                return lowestAvailableRank - 1
-            if(lowestAvailableRank == 11)
-                return 10
-            if(ranks[ptr]!! < num || ranks[ptr]!! != -1)
-                ptr++
-            else
-            {
-                lowestAvailableRank++
-                ptr++
-            }
-        }
-    }
-
-
     override fun toString(): String
     {
         var str : String = ""
