@@ -23,8 +23,7 @@ class Game
             startTurn()
             if(!isSorted())
             {
-                println("You lost, a number does not adhere to" +
-                        "the rules of the game!")
+                println("You lost, the number you placed wasn't in ascending order")
                 exitProcess(0)
             }
         }
@@ -37,12 +36,12 @@ class Game
         println("Generated num: $num")
         println(toString())
         print("Choose a ranking (1-10) or 'q' to quit: ")
-        var input = userInput()
+        var input = userInput(num)
         ranks[input] = num
         turn--
     }
 
-    private fun userInput() : Int
+    private fun userInput(num: Int) : Int
     {
         var input = readln()
         val regex = "^[A-Za-z]*$".toRegex()
@@ -70,9 +69,32 @@ class Game
 
     private fun validRankInput(rank: Int) : Boolean
     {
+        if(rank > 10 || rank < 0)
+            return false
         if(ranks[rank] == -1)
             return true
         return false
+    }
+
+
+    private fun checkValidSpots(num: Int) : Int
+    {
+        var lowestAvailableRank = 1
+        var ptr = 1
+        while(true)
+        {
+            if(ranks[ptr]!! > num)
+                return lowestAvailableRank - 1
+            if(lowestAvailableRank == 11)
+                return 10
+            if(ranks[ptr]!! < num || ranks[ptr]!! != -1)
+                ptr++
+            else
+            {
+                lowestAvailableRank++
+                ptr++
+            }
+        }
     }
 
 
